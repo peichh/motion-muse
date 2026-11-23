@@ -51,12 +51,16 @@ export const StoryAudio: React.FC<{ tl: StoryTimeline; voice?: number; duck?: nu
     <>
       {tl.lines.filter((l) => l.file).map((l) => <Sequence key={l.id} from={l.from} durationInFrames={l.dur + 15} layout="none"><Audio src={staticFile(l.file!)} volume={voice} /></Sequence>)}
       {tl.sfx.map((s, i) => <Sequence key={`s${i}`} from={s.from} durationInFrames={s.dur ?? tl.fps * 4} layout="none"><Audio src={staticFile(s.file)} volume={s.volume ?? 0.6} /></Sequence>)}
-      {tl.music.map((m, i) => (
-        <Sequence key={`m${i}`} from={m.from} durationInFrames={m.dur ?? tl.total - m.from} layout="none">
-          <Audio src={staticFile(m.file)} trimBefore={Math.round((m.trim ?? 0) * tl.fps)}
-            volume={(f) => (m.volume ?? 0.25) * (talking(m.from + f) ? duck : 1) * interpolate(f, [0, 15, (m.dur ?? tl.total - m.from) - 30, m.dur ?? tl.total - m.from], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
-        </Sequence>
-      ))}
+      {tl.music.map((m, i) => {
+        const len = m.dur ?? tl.total - m.from;
+        const fin = Math.min(15, len / 3), fout = Math.min(30, len / 3);
+        return (
+          <Sequence key={`m${i}`} from={m.from} durationInFrames={len} layout="none">
+            <Audio src={staticFile(m.file)} trimBefore={Math.round((m.trim ?? 0) * tl.fps)}
+              volume={(f) => (m.volume ?? 0.25) * (talking(m.from + f) ? duck : 1) * interpolate(f, [0, fin, len - fout, len], [0, 1, 1, 0], { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' })} />
+          </Sequence>
+        );
+      })}
     </>
   );
 };
