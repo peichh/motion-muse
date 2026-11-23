@@ -94,6 +94,9 @@ def cmd_openfilm(a):
     if sb.get("props", {}).get("subs", True):
         print("note: the scenes have burned-in subtitles; OpenFilm makes its own from the .vtt files. Run `story.py build --no-subs` and render again for clean shots.")
     out = os.path.abspath(os.path.expanduser(a.out)); A = os.path.join(out, "assets")
+    if os.path.exists(os.path.join(out, "film.html")) and not a.force:
+        sys.exit(f"{out}/film.html exists and may hold Studio edits; its shots and sounds would be replaced under it. "
+                 "Export to a new --out, or pass --force to overwrite the film and its assets.")
     for sub in ("shots", "sfx", "music"): os.makedirs(os.path.join(A, sub), exist_ok=True)
     sdir = os.path.join(P, "out", "scenes", comp)
     shots, tracks_sfx, music = [], [], []
@@ -106,9 +109,9 @@ def cmd_openfilm(a):
         cues = [((l["from"] - sc["from"]) / fps, (l["from"] + l["dur"] - sc["from"]) / fps, l["text"]) for l in tl["lines"] if l["scene"] == s["id"]]
         if cues: open(os.path.join(out, dst[:-4] + ".vtt"), "w", encoding="utf-8").write(vtt(cues))
         shots.append(f'  <video src="{dst}#t=0,{s["dur"] / fps:.3f}" at="{sc["from"] / fps:.3f}" id="{s["id"]}"></video>')
-    def put(sub, f):
-        dst = f"assets/{sub}/{os.path.basename(f)}"
-        if not os.path.exists(os.path.join(out, dst)): shutil.copy2(os.path.join(P, "public", f), os.path.join(out, dst))
+    def put(sub, f):  # the path under public/ names the asset, so two files with one basename stay apart
+        dst = f"assets/{sub}/" + re.sub(r"[\\/]+", "-", os.path.normpath(f).lstrip("./\\"))
+        shutil.copy2(os.path.join(P, "public", f), os.path.join(out, dst))
         return dst
     def length(f):  # decoded length: browsers drop the encoder padding that ffprobe's duration counts
         r = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-stats", "-i", os.path.join(P, "public", f), "-f", "null", "-"], capture_output=True, text=True)
@@ -134,9 +137,6 @@ def cmd_openfilm(a):
         f"<title>{html.escape(sb['title'])}</title>", "</head>", "<body>",
         sec(shots), *[sec(r) for r in tracks_sfx], *([sec(music)] if music else []), "</body>", "</html>", ""])
     fp = os.path.join(out, "film.html")
-    if os.path.exists(fp) and not a.force:
-        fp = os.path.join(out, "film.motion-muse.html")
-        print(f"film.html exists (may hold Studio edits): wrote {fp}; merge by hand or pass --force")
     open(fp, "w", encoding="utf-8").write(film)
     print(f"OK {len(shots)} shots, {sum(map(len, tracks_sfx))} sfx on {len(tracks_sfx)} tracks, {len(music)} music → {fp}")
     print(f"open it: cd {out} && npx -y openfilm@latest   (Studio)   |   check: npx openfilm look   |   render: npx openfilm render --loudness=-14")

@@ -23,8 +23,8 @@ What `story.py openfilm` writes:
 | `assets/music/*` on the last track, trimmed | `timeline.json` `music` |
 | `<meta name="viewport">` | the storyboard's width × height |
 
-It never overwrites a `film.html` that exists (it may hold Studio edits): it writes `film.motion-muse.html` beside it
-unless you pass `--force`.
+It stops without touching anything when `--out` already holds a `film.html` (it may hold Studio edits, and new shots
+under its old cuts would not match): export to a new folder, or pass `--force` to overwrite the film and its assets.
 
 Burned-in subtitles: shots rendered without `--no-subs` already have the subtitles in the picture; OpenFilm would
 show them twice. Build with `--no-subs` (sets the storyboard's `props.subs` to false; `director.py render` passes
