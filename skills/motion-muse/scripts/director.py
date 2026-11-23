@@ -38,6 +38,8 @@ ALWAYS = ["thai-type"]
 def caps_for(text):
     t = text.lower()
     found = [c for c, (rx, *_rest) in CAPS.items() if re.search(rx, t)]
+    if "toon" in found and re.search(r"stick ?man|stickman|ก้างปลา|vector|2d|2 มิติ", t) and not re.search(r"3 ?d|3 มิติ|toon|cel.?shad", t):
+        found = [c for c in found if c != "toon"]
     if "toon" in found:
         if "3d" not in found:
             found.append("3d")
