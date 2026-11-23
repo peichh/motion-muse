@@ -146,7 +146,7 @@ const End: React.FC<S> = ({ f, abs, dur, font }) => {
       })}
       <ToonCharacter look={CLERK} pose={breathe(cp, abs)} position={CPOS} face={face('clerk', abs, 5, { brow: 'sad' })} />
     </Stage3D>
-    <AbsoluteFill style={{ alignItems: 'center', paddingTop: 300, opacity: ease(f, dur - 55, dur - 40, 0, 1) }}>
+    <AbsoluteFill style={{ alignItems: 'center', paddingTop: 560, opacity: ease(f, dur - 55, dur - 40, 0, 1) }}>
       <div style={{ fontFamily: font, fontWeight: 900, fontSize: 92, color: '#FFF4D6', WebkitTextStroke: '8px #1B1520', paintOrder: 'stroke fill', textShadow: '0 8px 0 #1B1520' }}>ติดตามตอนต่อไป</div>
     </AbsoluteFill>
   </>);

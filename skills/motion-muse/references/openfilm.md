@@ -18,8 +18,8 @@ What `story.py openfilm` writes:
 | OpenFilm | From |
 | --- | --- |
 | `assets/shots/NN-<scene>.mp4` on the first track, end to end | each scene `director.py render` cached (muted) |
-| `assets/shots/NN-<scene>.vtt` beside each shot | the scene's lines, with a timestamp tag per word: Studio turns them into a caption track |
-| `assets/sfx/*` on as few sound tracks as fit, at their film second | `timeline.json` `sfx` |
+| `assets/shots/NN-<scene>.vtt` beside each shot | the scene's lines, with a timestamp tag per word; Studio and `look` merge them into one caption track (`captions/captions.vtt`) that follows the shots when they are cut |
+| `assets/sfx/*` on as few sound tracks as fit, at their film second, trimmed to their decoded length | `timeline.json` `sfx` |
 | `assets/music/*` on the last track, trimmed | `timeline.json` `music` |
 | `<meta name="viewport">` | the storyboard's width × height |
 
@@ -42,4 +42,5 @@ its brief tells the agent to install Motion Muse and build the episode with it, 
 - Every clip is an element: `<video>`, `<img>`, `<audio>`, `<iframe>` (a page with `window.film.frame(t)`).
   `src="...#t=in,out"` trims, `at` places, CSS positions and animates (`translate`/`scale`/`rotate`, never `transform`).
 - Never re-encode to cut: trim with `#t=`. Never draw subtitles in a page: use a `.vtt` beside the media.
-- Check: `npx openfilm look` (contact sheet + determinism), render: `npx openfilm render --loudness=-14`.
+- Check: `npx openfilm look` (contact sheet + determinism), render: `npx openfilm render --loudness=-14` (the exported
+  mix is about -22 LUFS before that).

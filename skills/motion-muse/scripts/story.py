@@ -110,10 +110,12 @@ def cmd_openfilm(a):
         dst = f"assets/{sub}/{os.path.basename(f)}"
         if not os.path.exists(os.path.join(out, dst)): shutil.copy2(os.path.join(P, "public", f), os.path.join(out, dst))
         return dst
-    def length(f):
-        r = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", os.path.join(P, "public", f)], capture_output=True, text=True)
-        try: return float(r.stdout.strip())
-        except ValueError: return 2.0
+    def length(f):  # decoded length: browsers drop the encoder padding that ffprobe's duration counts
+        r = subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-stats", "-i", os.path.join(P, "public", f), "-f", "null", "-"], capture_output=True, text=True)
+        m = re.findall(r"time=(\d+):(\d+):([\d.]+)", r.stderr)
+        if not m: return 2.0
+        h, mi, se = m[-1]
+        return max(0.05, int(h) * 3600 + int(mi) * 60 + float(se) - 0.01)
     lanes = []  # pack SFX onto as few non-overlapping tracks as possible
     for k, x in enumerate(tl["sfx"]):
         a0 = x["from"] / fps; ln = min(length(x["file"]), (x.get("dur") or 1e9) / fps)
@@ -123,6 +125,7 @@ def cmd_openfilm(a):
         tracks_sfx[lane].append(f'  <audio src="{put("sfx", x["file"])}#t=0,{ln:.3f}" at="{a0:.3f}" volume="{x.get("volume", 0.6)}" id="sfx{k + 1}"></audio>')
     for k, m in enumerate(tl["music"]):
         a0 = m["from"] / fps; ln = (m.get("dur") or (tl["total"] - m["from"])) / fps; tr = m.get("trim", 0)
+        ln = min(ln, length(m["file"]) - tr)
         music.append(f'  <audio src="{put("music", m["file"])}#t={tr:.3f},{tr + ln:.3f}" at="{a0:.3f}" volume="{m.get("volume", 0.22)}" id="music{k + 1}"></audio>')
     sec = lambda rows: "<section>\n" + "\n".join(rows) + "\n</section>"
     film = "\n".join([
