@@ -24,6 +24,7 @@ CAPS = {
     "data-viz":     (r"data|ข้อมูล|statistic|สถิติ|chart|graph|map|แผนที่", "SVG + d3 (scales/shapes only)", ["d3@7", "@types/d3@7"], [], "use d3 for maths, render with React; never d3 transitions"),
     "parallax":     (r"parallax|2\.5d|layer|landscape|วิว|ฉากหลัง|side.?scroll|storybook", "CSS transforms + lib/parallax", [], [], "Layer depth, Ridge, Skyline, FogBand"),
     "3d":           (r"\b3d\b|สามมิติ|three|camera|กล้อง|environment|world|ฉาก 3|product.*(render|3d)|cinematic", "@remotion/three + React Three Fiber + lib/three", [f"@remotion/three@{RV}", "three@0.178.0", "@react-three/fiber@9.3.0", "@types/three@0.178.0"], ["three/three.tsx"], "frame-driven only (no useFrame); --gl=swangle without a GPU"),
+    "toon":         (r"toon|cel.?shad|การ์ตูน ?3 ?d|3d cartoon|cartoon story|เล่าเรื่อง|ตลกร้าย|skit|sketch|episode|ตอน(ที่)?|ซอมบี้|zombie", "lib/toon (cel shading, ink outlines, 360° characters, sets) + lib/story + scripts/story.py", [f"@remotion/three@{RV}", "three@0.178.0", "@react-three/fiber@9.3.0", "@types/three@0.178.0"], ["three/three.tsx", "three/toon.tsx"], "references/toon-story.md; subtitles + SFX + music, voice only if asked; --gl=swangle without a GPU"),
     "atmosphere":   (r"horror|สยอง|น่ากลัว|fog|หมอก|cinematic|ภาพยนตร์|mood|light|แสง|rain|ฝน|dust|apocalyp|ล่มสลาย|dark", "CSS/SVG + lib/atmosphere", [], [], "GodRays, Fog, Particles, Glow, Vignette, Letterbox"),
     "product":      (r"product|สินค้า|luxury|หรู|premium|advert|โฆษณา|brand|แบรนด์|packshot|perfume|น้ำหอม|cosmetic", "lib/three Lathe + StudioLights (3D) or CSS layers (2D)", [], [], "minimal layout, slow camera, light sweep, one idea per shot"),
     "lottie":       (r"lottie|\.json animation|after effects", "@remotion/lottie (user-supplied files only)", [f"@remotion/lottie@{RV}", "lottie-web"], [], "only for Lottie files the user provides or has a license for"),
@@ -37,8 +38,13 @@ ALWAYS = ["thai-type"]
 def caps_for(text):
     t = text.lower()
     found = [c for c, (rx, *_rest) in CAPS.items() if re.search(rx, t)]
-    if "3d" in found and "product" in found:
-        pass
+    if "toon" in found:
+        if "3d" not in found:
+            found.append("3d")
+        if not re.search(r"stick ?man|stickman|ก้างปลา|vector|2d|2 มิติ", t):
+            found = [c for c in found if c != "character-2d"]
+        if not re.search(r"footage|ฟุตเทจ|b-?roll|interview|สัมภาษณ์", t):
+            found = [c for c in found if c != "footage"]
     return list(dict.fromkeys(ALWAYS + found))
 
 
@@ -172,7 +178,7 @@ def cmd_render(a):
     P = os.path.abspath(a.project); sb = load_sb(a.storyboard)
     fps = sb["fps"]
     caps = {c for s in sb["scenes"] for c in s.get("caps", [])}
-    gl = a.gl or os.environ.get("MOTION_MUSE_GL") or ("swangle" if "3d" in caps else None)
+    gl = a.gl or os.environ.get("MOTION_MUSE_GL") or ("swangle" if caps & {"3d", "toon"} else None)
     src = os.path.join(P, "src")
     # cache key inputs: the composition folder (where the storyboard lives) + shared lib/transitions, not unrelated comps
     comp_dir = os.path.dirname(os.path.abspath(a.storyboard))
@@ -199,6 +205,7 @@ def cmd_render(a):
             for old in os.listdir(sdir):
                 if old.startswith(f"{i:02d}-{s['id']}-"): os.remove(os.path.join(sdir, old))
             cmd = ["npx", "remotion", "render", "src/index.ts", sb["comp"], out, f"--frames={a0}-{a1}", "--muted", "--timeout=120000", "--log=error"]
+            if sb.get("props"): cmd.append("--props=" + json.dumps(sb["props"], ensure_ascii=False))
             if gl: cmd.append(f"--gl={gl}")
             if a.concurrency: cmd.append(f"--concurrency={a.concurrency}")
             print(f"RENDER {s['id']} frames {a0}-{a1}{' gl=' + gl if gl else ''}", flush=True)
@@ -220,7 +227,7 @@ def cmd_render(a):
     astamp = audio + ".key"
     stale = a.force or not os.path.exists(audio) or not os.path.exists(astamp) or open(astamp).read() != akey
     if stale:
-        r = run(["npx", "remotion", "render", "src/index.ts", sb["comp"], audio, "--codec=wav", "--log=error", "--timeout=120000"] + ([f"--gl={gl}"] if gl else []), cwd=P)
+        r = run(["npx", "remotion", "render", "src/index.ts", sb["comp"], audio, "--codec=wav", "--log=error", "--timeout=120000"] + ([f"--gl={gl}"] if gl else []) + (["--props=" + json.dumps(sb["props"], ensure_ascii=False)] if sb.get("props") else []), cwd=P)
         if r.returncode: sys.exit(f"FAIL audio:\n{r.stderr[-2000:]}")
         open(astamp, "w").write(akey)
     final = os.path.join(P, "out", f"{sb['comp']}.mp4")

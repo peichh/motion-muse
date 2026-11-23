@@ -1,0 +1,59 @@
+{
+  "version": "1.3.0",
+  "repository": "https://github.com/peichh/motion-muse/tree/main/skills/toon-story",
+  "kind": "workflow",
+  "icon": "film",
+  "cover": "cover.jpg",
+  "order": 50,
+  "needs": {
+    "en": "Node.js 20+, FFmpeg; Motion Muse installs Remotion and three.js the first time"
+  },
+  "platforms": [
+    "macos",
+    "linux",
+    "windows"
+  ],
+  "title": {
+    "en": "Cartoon story episode",
+    "zh-CN": "卡通故事短剧",
+    "ja": "カートゥーン・ストーリー",
+    "ko": "카툰 스토리 에피소드",
+    "es": "Episodio de historia animada"
+  },
+  "summary": {
+    "en": "A vertical 3D cartoon skit with Thai subtitles, sound effects and music.",
+    "zh-CN": "竖屏 3D 卡通短剧，配泰语字幕、音效和音乐。",
+    "ja": "タイ語字幕・効果音・音楽つきの縦型3Dカートゥーン寸劇。",
+    "ko": "태국어 자막, 효과음, 음악이 있는 세로형 3D 카툰 콩트.",
+    "es": "Un sketch vertical de dibujos 3D con subtítulos en tailandés, efectos y música."
+  },
+  "details": {
+    "en": "Best for: TikTok / Reels / Shorts series, dark-comedy skits, 30 s to 3 min.\nWhat it does: writes the episode as shots, renders cel-shaded characters that stay the same from every angle, times subtitles, SFX and music, and lays every shot, caption and sound on its own track.",
+    "zh-CN": "适合：TikTok / Reels / Shorts 系列、黑色幽默短剧，30 秒到 3 分钟。\n它会：把故事写成镜头，渲染从各个角度都一致的卡通渲染角色，对齐字幕、音效和音乐，并把每个镜头、字幕和声音放在各自的轨道上。",
+    "ja": "おすすめ：TikTok / Reels / Shorts のシリーズ、ブラックコメディの寸劇、30秒〜3分。\nできること：話をショットに分け、どの角度でも同じに見えるトゥーン調キャラクターをレンダリングし、字幕・効果音・音楽のタイミングを合わせ、ショット・字幕・音をそれぞれのトラックに置きます。",
+    "ko": "추천 대상: TikTok / Reels / Shorts 시리즈, 블랙 코미디 콩트, 30초~3분.\n하는 일: 이야기를 샷으로 나누고, 어느 각도에서도 같은 모습의 툰 셰이딩 캐릭터를 렌더링하고, 자막·효과음·음악 타이밍을 맞춰 샷·자막·소리를 각각의 트랙에 놓습니다.",
+    "es": "Ideal para: series de TikTok / Reels / Shorts, sketches de humor negro, de 30 s a 3 min.\nQué hace: escribe el episodio en planos, renderiza personajes toon que se ven iguales desde cualquier ángulo, sincroniza subtítulos, efectos y música, y pone cada plano, subtítulo y sonido en su propia pista."
+  },
+  "permissions": {
+    "network": {
+      "domains": [
+        "registry.npmjs.org",
+        "github.com",
+        "*.githubusercontent.com",
+        "mixkit.co",
+        "*.mixkit.co",
+        "fonts.gstatic.com"
+      ],
+      "why": "Installs Motion Muse, Remotion and three.js the first time, fetches a free music track and the Thai font."
+    },
+    "project": {
+      "read": true,
+      "write": true,
+      "why": "Writes the rendered shots, captions, sound effects and music into film.html and assets/."
+    },
+    "agent": {
+      "scripts": true,
+      "why": "The agent runs Motion Muse's scripts to time the script, render the shots and export them to the project."
+    }
+  }
+}

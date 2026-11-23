@@ -13,11 +13,11 @@ import { Pose } from './pose';
 type V3 = [number, number, number];
 
 /** Full-frame 3D stage: background, fog, tone mapping, shadows. */
-export const Stage3D: React.FC<{ children: React.ReactNode; background?: string; fog?: [string, number, number]; exposure?: number; shadows?: boolean; env?: boolean; fov?: number }> = ({ children, background = '#0B0D12', fog, exposure = 1, shadows = true, env = false, fov = 40 }) => {
+export const Stage3D: React.FC<{ children: React.ReactNode; background?: string; fog?: [string, number, number]; exposure?: number; shadows?: boolean; env?: boolean; fov?: number; tone?: 'aces' | 'none' }> = ({ children, background = '#0B0D12', fog, exposure = 1, shadows = true, env = false, fov = 40, tone = 'aces' }) => {
   const { width, height } = useVideoConfig();
   return (
     <ThreeCanvas width={width} height={height} shadows={shadows} camera={{ fov, near: 0.1, far: 200, position: [0, 2, 8] }}
-      gl={{ antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: exposure, preserveDrawingBuffer: true }}>
+      gl={{ antialias: true, toneMapping: tone === 'none' ? THREE.NoToneMapping : THREE.ACESFilmicToneMapping, toneMappingExposure: exposure, preserveDrawingBuffer: true }}>
       <color attach="background" args={[background]} />
       {fog && <fog attach="fog" args={fog} />}
       {env && <RoomEnv />}

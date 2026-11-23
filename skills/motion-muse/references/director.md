@@ -102,5 +102,6 @@ python3 "$SKILL_DIR/scripts/director.py" render ~/videos/<slug> src/<slug>/story
 | `examples/zombie-biology` | SVG only | stickman + vector characters, gaits, diagrams, parallax race, Mali |
 | `examples/apocalypse-observer` | `@remotion/three` | ruined procedural city, third-person observer camera, fog/ash, flicker, silhouettes, Noto Serif Thai |
 | `examples/luxury-product` | `@remotion/three` | lathe-turned bottle, studio lighting, macro orbit, packshot, IBM Plex Sans Thai |
+| `examples/zombie-id` | `@remotion/three` + `lib/toon` + `lib/story` | toon story: cel-shaded zombie and clerk, graveyard and office sets, Thai signs, 360° orbit, subtitles + SFX + music from `script.json`, no voice, Prompt (run `story.py build` on its `script.json` first) |
 
 Copy with `cp -r "$SKILL_DIR/examples/<name>" src/` (they import `../lib/*` and `../transitions`), set `"resolveJsonModule": true` (done by `init`), and put the example's music at the path it expects or swap it for a new track.

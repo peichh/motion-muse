@@ -64,8 +64,10 @@ python3 "$SKILL_DIR/scripts/director.py" init ~/videos/<slug> --caps <caps>    #
 python3 "$SKILL_DIR/scripts/director.py" check src/<slug>/storyboard.json      # scene table to show the user
 python3 "$SKILL_DIR/scripts/director.py" render ~/videos/<slug> src/<slug>/storyboard.json   # per-scene cached render + mix + QA
 ```
-- Building blocks in `starter/src/lib/`: `characters` + `pose` (stickman / vector characters, gaits, key poses), `diagram`, `parallax`, `atmosphere`, `typography` (Thai font registry + kinetic text), `noise`; `starter/kits/three/three.tsx` for 3D (copied by `init --caps 3d`).
-- Worked examples to copy from: `examples/zombie-biology` (SVG cartoon explainer), `examples/apocalypse-observer` (3D horror, third-person camera), `examples/luxury-product` (3D product ad, Thai sans).
+- Building blocks in `starter/src/lib/`: `characters` + `pose` (stickman / vector characters, gaits, key poses), `diagram`, `parallax`, `atmosphere`, `typography` (Thai font registry + kinetic text), `noise`; `starter/kits/three/three.tsx` for 3D (copied by `init --caps 3d`), `starter/kits/three/toon.tsx` for cel-shaded 3D cartoon characters and sets (`--caps toon`), `story.tsx` for dialogue subtitles, SFX and music on one timeline.
+- Cartoon story episodes (skits, ตลกร้าย, ซอมบี้ไปทำบัตร, 30 s – 3 min, 9:16): read `references/toon-story.md`. Write `script.json`, run `scripts/story.py build`, then render. No voice-over unless the user asks: dialogue is Thai subtitles with name tags and the mouths move while each line is on screen.
+- To edit the result in OpenFilm Studio (tracks for every shot, SFX and the music, editable captions): `references/openfilm.md`, `scripts/story.py openfilm`.
+- Worked examples to copy from: `examples/zombie-biology` (SVG cartoon explainer), `examples/apocalypse-observer` (3D horror, third-person camera), `examples/luxury-product` (3D product ad, Thai sans), `examples/zombie-id` (toon story: zombie goes to get an ID card, 8 shots, 52 s, subtitles + SFX + music, no voice).
 - Pick the Thai font by mood (`director.md` section 4) and fetch it with `scripts/thai-fonts.sh`.
 - Steps 2–7 below still apply: gallery references, seam plan and transitions, fresh music, SFX, QA, delivery.
 
