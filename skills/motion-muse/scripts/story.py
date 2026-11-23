@@ -111,7 +111,7 @@ def cmd_openfilm(a):
         shots.append(f'  <video src="{dst}#t=0,{s["dur"] / fps:.3f}" at="{sc["from"] / fps:.3f}" id="{s["id"]}"></video>')
     def put(sub, f):  # the path under public/ names the asset, so two files with one basename stay apart
         rel = re.sub(rf"^(audio/)?({sub}/)?", "", os.path.normpath(f).replace("\\", "/").lstrip("./"))
-        dst = f"assets/{sub}/" + rel.replace("/", "-")
+        dst = f"assets/{sub}/" + re.sub(r"[/\s#?%&\"'<>]+", "-", rel)  # the name goes into a URL
         shutil.copy2(os.path.join(P, "public", f), os.path.join(out, dst))
         return dst
     def length(f):  # decoded length: browsers drop the encoder padding that ffprobe's duration counts
